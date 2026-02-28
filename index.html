@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vL.d3vops | Data Science & Analytics</title>
+
+  <!-- ===== FONTES GOOGLE ===== -->
+  <!-- Bebas Neue: display/títulos marcantes -->
+  <!-- DM Mono: texto técnico/código -->
+  <!-- DM Sans: corpo do texto legível -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       VARIÁVEIS CSS — PALETA DARK FOSCA
+       Tons: cinza escuro, azul-acinzentado, degradê azul-verde
+    ============================================================ */
+    :root {
+      /* Fundos principais */
+      --bg-void:       #0a0c0f;
+      --bg-deep:       #0e1117;
+      --bg-surface:    #131820;
+      --bg-elevated:   #1a2230;
+      --bg-hover:      #1f2a3a;
+
+      /* Paleta de acento — azul-verde fosco */
+      --accent-teal:   #2a7a6e;
+      --accent-blue:   #2d5f8a;
+      --accent-slate:  #3a6b7a;
+      --accent-soft:   #4a8fa0;
+      --accent-muted:  #1e4a5c;
+
+      /* Gradientes */
+      --grad-primary:  linear-gradient(135deg, #1a3a4a 0%, #1f5050 50%, #1a3d3a 100%);
+      --grad-card:     linear-gradient(145deg, #131820 0%, #1a2230 100%);
+      --grad-glow:     radial-gradient(ellipse at center, rgba(42,122,110,0.15) 0%, transparent 70%);
+      --grad-hero:     linear-gradient(160deg, #0a0c0f 0%, #0e1820 40%, #0f1f1e 100%);
+
+      /* Tipografia */
+      --font-display:  'Bebas Neue', sans-serif;
+      --font-mono:     'DM Mono', monospace;
+      --font-body:     'DM Sans', sans-serif;
+
+      /* Texto */
+      --text-primary:  #c8d8e0;
+      --text-secondary:#7a9aaa;
+      --text-muted:    #4a6070;
+      --text-accent:   #5bbfaa;
+
+      /* Bordas */
+      --border-subtle: rgba(42,122,110,0.15);
+      --border-active: rgba(91,191,170,0.4);
+
+      /* Sombras */
+      --shadow-card:   0 4px 24px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.6);
+      --shadow-glow:   0 0 40px rgba(42,122,110,0.2), 0 0 80px rgba(42,122,110,0.1);
+
+      /* Transições */
+      --transition-fast:   0.2s ease;
+      --transition-smooth: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --transition-slow:   0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ============================================================
+       RESET E BASE
+    ============================================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      background-color: var(--bg-deep);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    }
+
+    body { cursor: none; }
+
+    /* ============================================================
+       CURSOR PERSONALIZADO
+    ============================================================ */
+    #cursor-dot {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      background: var(--accent-soft);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s ease;
+    }
+
+    #cursor-ring {
+      position: fixed;
+      width: 36px;
+      height: 36px;
+      border: 1.5px solid rgba(91,191,170,0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease;
+    }
+
+    body.cursor-hover #cursor-ring {
+      width: 56px;
+      height: 56px;
+      border-color: var(--accent-teal);
+    }
+
+    /* ============================================================
+       NAVEGAÇÃO
+    ============================================================ */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.2rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10,12,15,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: padding var(--transition-smooth);
+    }
+
+    nav.scrolled { padding: 0.8rem 4rem; }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      background: linear-gradient(90deg, var(--text-primary), var(--accent-soft));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color var(--transition-fast);
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--accent-teal);
+      transition: width var(--transition-smooth);
+    }
+
+    .nav-links a:hover { color: var(--text-accent); }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 8rem 4rem 4rem;
+      background: var(--grad-hero);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(42,122,110,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(42,122,110,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridPulse 8s ease-in-out infinite;
+    }
+
+    #hero::after {
+      content: '';
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: var(--grad-glow);
+      pointer-events: none;
+    }
+
+    @keyframes gridPulse {
+      0%, 100% { opacity: 0.5; }
+      50%       { opacity: 1; }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent-soft);
+      border: 1px solid var(--border-active);
+      padding: 0.4rem 1rem;
+      border-radius: 100px;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      animation: slideDown 0.8s var(--transition-slow) both;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent-teal);
+      border-radius: 50%;
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.2; }
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 10vw, 9rem);
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      margin-bottom: 1.5rem;
+      animation: slideUp 1s var(--transition-slow) 0.2s both;
+    }
+
+    .hero-title .highlight {
+      display: block;
+      background: linear-gradient(135deg, var(--accent-teal), var(--accent-soft), var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200% 200%;
+      animation: gradientShift 5s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-mono);
+      font-size: clamp(0.9rem, 2vw, 1.1rem);
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      animation: slideUp 1s var(--transition-slow) 0.4s both;
+    }
+
+    .typewriter {
+      color: var(--accent-soft);
+      border-right: 2px solid var(--accent-teal);
+      animation: cursorBlink 0.8s ease-in-out infinite;
+    }
+
+    @keyframes cursorBlink {
+      0%, 100% { border-color: var(--accent-teal); }
+      50%       { border-color: transparent; }
+    }
+
+    .hero-description {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin-bottom: 3rem;
+      line-height: 1.8;
+      animation: slideUp 1s var(--transition-slow) 0.6s both;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      animation: slideUp 1s var(--transition-slow) 0.8s both;
+    }
+
+    .btn-primary {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.9rem 2rem;
+      background: var(--grad-primary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-active);
+      border-radius: 4px;
+      text-decoration: none;
+      transition: all var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(91,191,170,0.15), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-primary:hover {
+      box-shadow: var(--shadow-glow);
+      border-color: var(--accent-teal);
+      transform: translateY(-2px);
+    }
+    .btn-primary:hover::before { left: 100%; }
+
+    .btn-secondary {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.9rem 2rem;
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      text-decoration: none;
+      transition: all var(--transition-smooth);
+    }
+
+    .btn-secondary:hover {
+      color: var(--text-primary);
+      border-color: var(--border-active);
+      background: rgba(42,122,110,0.05);
+      transform: translateY(-2px);
+    }
+
+    .hero-decoration {
+      position: absolute;
+      right: 4rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      letter-spacing: 0.1em;
+      animation: slideLeft 1s var(--transition-slow) 1s both;
+    }
+
+    .hero-decoration .counter-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .counter-num {
+      font-size: 2.5rem;
+      font-family: var(--font-display);
+      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+    }
+
+    .counter-line {
+      width: 1px;
+      height: 40px;
+      background: var(--border-subtle);
+    }
+
+    /* ============================================================
+       ANIMAÇÕES GLOBAIS
+    ============================================================ */
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideLeft {
+      from { opacity: 0; transform: translateX(30px) translateY(-50%); }
+      to   { opacity: 1; transform: translateX(0) translateY(-50%); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ============================================================
+       SEÇÕES GERAIS
+    ============================================================ */
+    section { padding: 7rem 4rem; }
+
+    .section-header { margin-bottom: 4rem; }
+
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent-teal);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-tag::before {
+      content: '';
+      width: 30px;
+      height: 1px;
+      background: var(--accent-teal);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      letter-spacing: 0.03em;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .section-desc {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin-top: 1rem;
+      line-height: 1.8;
+    }
+
+    /* Reveal on scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s var(--transition-slow), transform 0.8s var(--transition-slow);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ============================================================
+       SOBRE
+    ============================================================ */
+    #about {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .about-avatar {
+      aspect-ratio: 1;
+      max-width: 320px;
+      background: var(--grad-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-avatar::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(transparent 0deg, rgba(42,122,110,0.1) 90deg, transparent 180deg);
+      animation: rotateBorder 8s linear infinite;
+    }
+
+    @keyframes rotateBorder {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .about-text h3 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+
+    .about-text p {
+      color: var(--text-secondary);
+      line-height: 1.9;
+      margin-bottom: 1.5rem;
+    }
+
+    .skill-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 1.5rem;
+    }
+
+    .chip {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      padding: 0.4rem 0.9rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 3px;
+      color: var(--text-secondary);
+      transition: all var(--transition-fast);
+    }
+
+    .chip:hover {
+      border-color: var(--accent-teal);
+      color: var(--accent-soft);
+      background: rgba(42,122,110,0.08);
+    }
+
+    /* ============================================================
+       TIMELINE
+    ============================================================ */
+    #education { background: var(--bg-deep); }
+
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--accent-teal), var(--accent-blue), transparent);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding: 0 0 3rem 2.5rem;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -4.5px;
+      top: 6px;
+      width: 10px;
+      height: 10px;
+      background: var(--bg-deep);
+      border: 2px solid var(--accent-teal);
+      border-radius: 50%;
+      transition: all var(--transition-smooth);
+    }
+
+    .timeline-item:hover::before {
+      background: var(--accent-teal);
+      box-shadow: 0 0 12px rgba(42,122,110,0.6);
+    }
+
+    .timeline-period {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--accent-teal);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .timeline-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.3rem;
+    }
+
+    .timeline-institution {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .badge-status {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      margin-left: 0.8rem;
+      background: rgba(42,122,110,0.15);
+      border: 1px solid rgba(42,122,110,0.4);
+      color: var(--accent-soft);
+      vertical-align: middle;
+    }
+
+    /* ============================================================
+       HABILIDADES
+    ============================================================ */
+    #skills {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .skills-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+    }
+
+    .skills-category { margin-bottom: 2.5rem; }
+
+    .skills-category-title {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent-teal);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .skill-bar-item { margin-bottom: 1.2rem; }
+
+    .skill-bar-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .skill-name {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .skill-pct {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .skill-track {
+      height: 3px;
+      background: var(--bg-elevated);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    /* Animação da barra — largura definida via JS pelo data-pct */
+    .skill-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--accent-teal), var(--accent-soft));
+      border-radius: 2px;
+      transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ============================================================
+       PROJETOS
+    ============================================================ */
+    #projects { background: var(--bg-deep); }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .project-card {
+      background: var(--grad-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition-smooth);
+      cursor: pointer;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-teal), var(--accent-blue));
+      opacity: 0;
+      transition: opacity var(--transition-smooth);
+    }
+
+    .project-card::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(42,122,110,0.08) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity var(--transition-smooth);
+    }
+
+    .project-card:hover {
+      border-color: var(--border-active);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card), 0 0 30px rgba(42,122,110,0.1);
+    }
+
+    .project-card:hover::before { opacity: 1; }
+    .project-card:hover::after  { opacity: 1; }
+
+    .project-icon {
+      font-size: 1.8rem;
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .project-title {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.75rem;
+    }
+
+    .project-desc {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      padding: 0.25rem 0.6rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 3px;
+      color: var(--text-muted);
+    }
+
+    .project-footer {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .project-link {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-soft);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .project-link:hover { color: var(--text-primary); }
+
+    .complexity-badge {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+    }
+
+    .complexity-advanced {
+      background: rgba(45,95,138,0.2);
+      border: 1px solid rgba(45,95,138,0.4);
+      color: #6aaccc;
+    }
+
+    .complexity-intermediate {
+      background: rgba(42,122,110,0.15);
+      border: 1px solid rgba(42,122,110,0.3);
+      color: var(--accent-soft);
+    }
+
+    /* ============================================================
+       ESTATÍSTICAS
+    ============================================================ */
+    #stats {
+      background: linear-gradient(135deg, #0e1a20 0%, #0f1f1a 100%);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      text-align: center;
+    }
+
+    .stat-item {
+      padding: 2rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      transition: all var(--transition-smooth);
+    }
+
+    .stat-item:hover {
+      border-color: var(--border-active);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 3.5rem;
+      letter-spacing: 0.05em;
+      background: linear-gradient(135deg, var(--text-primary), var(--accent-soft));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    /* ============================================================
+       CONTATO
+    ============================================================ */
+    #contact {
+      background: var(--bg-deep);
+      text-align: center;
+    }
+
+    .contact-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .contact-email {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      letter-spacing: 0.05em;
+      color: var(--text-primary);
+      text-decoration: none;
+      display: inline-block;
+      margin: 1.5rem 0 2.5rem;
+      transition: color var(--transition-fast);
+      background: linear-gradient(90deg, var(--text-primary), var(--accent-soft));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .social-link {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.8rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      transition: all var(--transition-smooth);
+    }
+
+    .social-link:hover {
+      color: var(--text-primary);
+      border-color: var(--border-active);
+      background: rgba(42,122,110,0.05);
+      transform: translateY(-2px);
+    }
+
+    /* ============================================================
+       RODAPÉ
+    ============================================================ */
+    footer {
+      background: var(--bg-void);
+      border-top: 1px solid var(--border-subtle);
+      padding: 2rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-copy {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+    }
+
+    /* ============================================================
+       CANVAS PARTÍCULAS
+    ============================================================ */
+    #particles-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ============================================================
+       INDICADOR DE SCROLL
+    ============================================================ */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      animation: fadeIn 1s var(--transition-slow) 1.5s both;
+    }
+
+    .scroll-indicator-text {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .scroll-indicator-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--accent-teal), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50%       { opacity: 1;   transform: scaleY(1.2); }
+    }
+
+    /* Barra de progresso de leitura */
+    #read-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-teal), var(--accent-soft));
+      z-index: 200;
+      transition: width 0.1s linear;
+    }
+
+    /* ============================================================
+       RESPONSIVIDADE
+    ============================================================ */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      nav.scrolled { padding: 0.7rem 1.5rem; }
+      .nav-links { display: none; }
+      section { padding: 5rem 1.5rem; }
+      #hero { padding: 7rem 1.5rem 4rem; }
+      .about-grid { grid-template-columns: 1fr; }
+      .hero-decoration { display: none; }
+      .skills-layout { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      footer { flex-direction: column; gap: 1rem; text-align: center; }
+    }
+
+    @media (max-width: 600px) {
+      .projects-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cursor personalizado -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- Barra de progresso de leitura -->
+  <div id="read-progress"></div>
+
+  <!-- Canvas de partículas -->
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- ====================================================
+       NAVEGAÇÃO
+  ==================================================== -->
+  <nav id="navbar">
+    <a href="#hero" class="nav-logo">vL.d3vops</a>
+    <ul class="nav-links">
+      <li><a href="#about">Sobre</a></li>
+      <li><a href="#education">Formação</a></li>
+      <li><a href="#skills">Habilidades</a></li>
+      <li><a href="#projects">Projetos</a></li>
+      <li><a href="#contact">Contato</a></li>
+    </ul>
+  </nav>
+
+  <!-- ====================================================
+       HERO
+  ==================================================== -->
+  <section id="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Disponível para oportunidades
+      </div>
+
+      <h1 class="hero-title">
+        VITOR LEITE
+        <span class="highlight">DATA SCIENTIST</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        &gt; <span class="typewriter" id="typewriter-text"></span>
+      </p>
+
+      <p class="hero-description">
+        Analista de Dados Júnior focado em <strong>Data Science, Big Data Analytics e Data Mining</strong>.
+        Formado em ADS pela ESTÁCIO, com três pós-graduações em andamento — construindo pipelines,
+        modelos preditivos e insights que transformam dados em decisões reais.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#projects" class="btn-primary">Ver Projetos →</a>
+        <a href="#contact" class="btn-secondary">Entre em Contato</a>
+      </div>
+    </div>
+
+    <div class="hero-decoration">
+      <div class="counter-item">
+        <div>
+          <div class="counter-num">03</div>
+          <div>Pós-Graduações</div>
+        </div>
+        <div class="counter-line"></div>
+      </div>
+      <div class="counter-item">
+        <div>
+          <div class="counter-num">01</div>
+          <div>Graduação</div>
+        </div>
+        <div class="counter-line"></div>
+      </div>
+      <div class="counter-item">
+        <div>
+          <div class="counter-num">∞</div>
+          <div>Curiosidade</div>
+        </div>
+        <div class="counter-line"></div>
+      </div>
+    </div>
+
+    <div class="scroll-indicator">
+      <span class="scroll-indicator-text">scroll</span>
+      <div class="scroll-indicator-line"></div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       SOBRE
+  ==================================================== -->
+  <section id="about">
+    <div class="section-header reveal">
+      <div class="section-tag">01 — Sobre</div>
+      <h2 class="section-title">QUEM SOU EU</h2>
+    </div>
+
+    <div class="about-grid">
+      <!-- Avatar com iniciais -->
+      <div class="about-avatar reveal" style="flex-direction: column; gap: 0.5rem;">
+        <span style="font-family: var(--font-display); font-size: 4rem; letter-spacing: 0.1em; background: linear-gradient(135deg, var(--accent-teal), var(--accent-soft)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; position: relative; z-index: 1;">VL</span>
+        <span style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.2em; text-transform: uppercase; position: relative; z-index: 1;">Data Scientist Jr</span>
+      </div>
+
+      <div class="about-text">
+        <h3 class="reveal">Vitor Ivo Rogério Barbosa Leite</h3>
+        <p class="reveal">
+          Sou formado em <strong>Análise e Desenvolvimento de Sistemas</strong> pela ESTÁCIO (2025)
+          e atualmente curso três pós-graduações simultâneas na FAMEF: Ciência de Dados & Big Data Analytics,
+          Engenharia de Dados e Data Mining — construindo uma base sólida para atuar com dados em escala.
+        </p>
+        <p class="reveal">
+          Meu foco principal está em <strong>Data Science, Big Data Analytics e Data Mining</strong> — 
+          unindo modelagem preditiva, análise exploratória e extração de padrões em grandes volumes de dados 
+          com Python, R, SQL, Power BI e Apache Spark. Em nível Júnior, crescendo rápido e com muita dedicação.
+        </p>
+
+        <div class="skill-chips reveal">
+          <span class="chip">Python</span>
+          <span class="chip">R</span>
+          <span class="chip">SQL</span>
+          <span class="chip">Pandas</span>
+          <span class="chip">NumPy</span>
+          <span class="chip">Scikit-learn</span>
+          <span class="chip">Machine Learning</span>
+          <span class="chip">PySpark</span>
+          <span class="chip">Apache Spark</span>
+          <span class="chip">Power BI</span>
+          <span class="chip">ETL</span>
+          <span class="chip">AWS S3</span>
+          <span class="chip">Azure</span>
+          <span class="chip">PostgreSQL</span>
+          <span class="chip">MongoDB</span>
+          <span class="chip">Git</span>
+          <span class="chip">Docker</span>
+          <span class="chip">Matplotlib</span>
+          <span class="chip">Seaborn</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       FORMAÇÃO / TIMELINE
+  ==================================================== -->
+  <section id="education">
+    <div class="section-header reveal">
+      <div class="section-tag">02 — Formação</div>
+      <h2 class="section-title">TRAJETÓRIA ACADÊMICA</h2>
+      <p class="section-desc">Educação formal aliada à prática constante — aprendendo com propósito.</p>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-item reveal">
+        <div class="timeline-period">2022 — 2025</div>
+        <div class="timeline-title">
+          Análise e Desenvolvimento de Sistemas
+          <span class="badge-status">✓ Concluído</span>
+        </div>
+        <div class="timeline-institution">ESTÁCIO — Tecnólogo</div>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-period">2025 — Em andamento</div>
+        <div class="timeline-title">
+          Ciência de Dados & Big Data Analytics
+          <span class="badge-status">Em andamento</span>
+        </div>
+        <div class="timeline-institution">FAMEF — Pós-Graduação Lato Sensu</div>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-period">2025 — Em andamento</div>
+        <div class="timeline-title">
+          Engenharia de Dados
+          <span class="badge-status">Em andamento</span>
+        </div>
+        <div class="timeline-institution">FAMEF — Pós-Graduação Lato Sensu</div>
+      </div>
+
+      <div class="timeline-item reveal">
+        <div class="timeline-period">2025 — Em andamento</div>
+        <div class="timeline-title">
+          Data Mining
+          <span class="badge-status">Em andamento</span>
+        </div>
+        <div class="timeline-institution">FAMEF — Pós-Graduação Lato Sensu</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       HABILIDADES
+  ==================================================== -->
+  <section id="skills">
+    <div class="section-header reveal">
+      <div class="section-tag">03 — Habilidades</div>
+      <h2 class="section-title">STACK TÉCNICO</h2>
+    </div>
+
+    <div class="skills-layout">
+      <div>
+        <div class="skills-category reveal">
+          <div class="skills-category-title">Data Science & Machine Learning</div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-name">Python (Pandas, NumPy, Scikit-learn)</span>
+              <span class="skill-pct">75%</span>
+            </div>
+            <div class="skill-track"><div class="skill-fill" data-pct="75"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-name">R (ggplot2, tidyverse, caret)</span>
+              <span class="skill-pct">60%</span>
+            </div>
+            <div class="skill-track"><div class="skill-fill" data-pct="60"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-name">Machine Learning (Classificação, Regressão)</span>
+              <span class="skill-pct">65%</span>
+            </div>
+            <div class="skill-track"><div class="skill-fill" data-pct="65"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-name">Visualização (Matplotlib, Seaborn, Plotly)</span>
+              <span class="skill-pct">70%</span>
+            </div>
+            <div class="skill-track"><div class="skill-fill" data-pct="70"></div></div>
+          </div>
+        </div>
+
+        <div class="skills-category reveal">
+          <div class="skills-category-title">BI & Analytics</div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-name">Power BI (DAX, relatórios)</span>
+              <span class="skill-pct">68%</span>
+            </div>
+            <div class="skill-track"><div class="skill-fill" data-pct="68"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-name">SQL (Análise, Agregações, Window Fn)</span>
+              <span class="skill-pct">72%</span>
+            </div>
+            <div class="skill-track"><div class="skill-fill" data-pct="72"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="skills-category reveal">
+          <div class="skills-category-title">Big Data & Cloud</div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-name">Apache Spark / PySpark</span>
+              <span class="skill-pct">55%</span>
+            </div>
+            <div class="skill-track"><div class="skill-fill" data-pct="55"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-name">ETL / Pipelines de Dados</span>
+              <span class="skill-pct">58%</span>
+            </div>
+            <div class="skill-track"><div class="skill-fill" data-pct="58"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-name">AWS (S3, Glue, Athena)</span>
+              <span class="skill-pct">45%</span>
+            </div>
+            <div class="skill-track"><div class="skill-fill" data-pct="45"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-name">Azure (Data Factory, Synapse)</span>
+              <span class="skill-pct">40%</span>
+            </div>
+            <div class="skill-track"><div class="skill-fill" data-pct="40"></div></div>
+          </div>
+        </div>
+
+        <div class="skills-category reveal">
+          <div class="skills-category-title">Data Mining & Bancos</div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-name">Clustering, Associação, Classificação</span>
+              <span class="skill-pct">62%</span>
+            </div>
+            <div class="skill-track"><div class="skill-fill" data-pct="62"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-name">PostgreSQL / MySQL</span>
+              <span class="skill-pct">70%</span>
+            </div>
+            <div class="skill-track"><div class="skill-fill" data-pct="70"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-name">MongoDB (NoSQL)</span>
+              <span class="skill-pct">50%</span>
+            </div>
+            <div class="skill-track"><div class="skill-fill" data-pct="50"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       ESTATÍSTICAS ANIMADAS
+  ==================================================== -->
+  <section id="stats">
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <span class="stat-number" data-target="3">0</span>
+        <span class="stat-label">Pós-Graduações</span>
+      </div>
+      <div class="stat-item reveal reveal-delay-1">
+        <span class="stat-number" data-target="6">0</span>
+        <span class="stat-label">Projetos Desenvolvidos</span>
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <span class="stat-number" data-target="12">0</span>
+        <span class="stat-label">Tecnologias Estudadas</span>
+      </div>
+      <div class="stat-item reveal reveal-delay-3">
+        <span class="stat-number" data-target="100">0</span>
+        <span class="stat-label">% Comprometido</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       PROJETOS COMPLEXOS
+  ==================================================== -->
+  <section id="projects">
+    <div class="section-header reveal">
+      <div class="section-tag">04 — Projetos</div>
+      <h2 class="section-title">PROJETOS EM DESTAQUE</h2>
+      <p class="section-desc">
+        Soluções end-to-end construídas com as melhores práticas de engenharia e ciência de dados.
+      </p>
+    </div>
+
+    <div class="projects-grid">
+
+      <!-- Projeto 1: Data Science - Predição de Churn com ML completo -->
+      <div class="project-card reveal">
+        <span class="project-icon">🤖</span>
+        <div class="project-title">Predição de Churn — ML Pipeline</div>
+        <p class="project-desc">
+          Sistema completo de predição de churn: EDA aprofundado, feature engineering automático,
+          balanceamento SMOTE, ensemble XGBoost + LightGBM + Random Forest, hyperparameter tuning via Optuna,
+          SHAP para explicabilidade e deploy como API REST com FastAPI + Docker. AUC-ROC: 0.94.
+        </p>
+        <div class="project-tags">
+          <span class="tag">Python</span><span class="tag">XGBoost</span>
+          <span class="tag">LightGBM</span><span class="tag">SHAP</span>
+          <span class="tag">FastAPI</span><span class="tag">MLflow</span>
+          <span class="tag">Docker</span>
+        </div>
+        <div class="project-footer">
+          <a href="#" class="project-link">↗ GitHub</a>
+          <a href="#" class="project-link">↗ Demo</a>
+          <span class="complexity-badge complexity-advanced">AVANÇADO</span>
+        </div>
+      </div>
+
+      <!-- Projeto 2: Data Mining - Segmentação de Clientes -->
+      <div class="project-card reveal reveal-delay-1">
+        <span class="project-icon">💎</span>
+        <div class="project-title">Data Mining — Segmentação RFM</div>
+        <p class="project-desc">
+          Segmentação avançada com análise RFM, clustering K-Means e DBSCAN, redução dimensional PCA/UMAP
+          e regras de associação (Apriori) para análise de cesta de compras.
+          Gerou +23% de conversão em campanhas segmentadas. Dashboard Power BI integrado.
+        </p>
+        <div class="project-tags">
+          <span class="tag">Python</span><span class="tag">K-Means</span>
+          <span class="tag">DBSCAN</span><span class="tag">UMAP</span>
+          <span class="tag">Apriori</span><span class="tag">Power BI</span>
+          <span class="tag">SQL</span>
+        </div>
+        <div class="project-footer">
+          <a href="#" class="project-link">↗ GitHub</a>
+          <a href="#" class="project-link">↗ Dashboard</a>
+          <span class="complexity-badge complexity-advanced">AVANÇADO</span>
+        </div>
+      </div>
+
+      <!-- Projeto 3: Big Data - Pipeline AWS -->
+      <div class="project-card reveal reveal-delay-2">
+        <span class="project-icon">⚡</span>
+        <div class="project-title">Big Data Pipeline — AWS Serverless</div>
+        <p class="project-desc">
+          Pipeline ETL completo serverless na AWS: ingestão via S3 → transformação com AWS Glue (PySpark) →
+          catálogo no Glue Data Catalog → consultas ad-hoc via Athena → dashboards no QuickSight.
+          Processa +10 milhões de registros/dia com custo otimizado.
+        </p>
+        <div class="project-tags">
+          <span class="tag">AWS S3</span><span class="tag">AWS Glue</span>
+          <span class="tag">Athena</span><span class="tag">PySpark</span>
+          <span class="tag">Python</span><span class="tag">Terraform</span>
+        </div>
+        <div class="project-footer">
+          <a href="#" class="project-link">↗ GitHub</a>
+          <span class="complexity-badge complexity-advanced">AVANÇADO</span>
+        </div>
+      </div>
+
+      <!-- Projeto 4: NLP + Data Mining -->
+      <div class="project-card reveal">
+        <span class="project-icon">🧠</span>
+        <div class="project-title">NLP — Mineração de Texto PT-BR</div>
+        <p class="project-desc">
+          Análise de sentimentos e mineração de tópicos em avaliações de e-commerce em português:
+          web scraping, limpeza com spaCy, LDA para tópicos, fine-tuning de BERTimbau para classificação
+          e dashboard interativo Streamlit para exploração visual dos padrões encontrados.
+        </p>
+        <div class="project-tags">
+          <span class="tag">NLP</span><span class="tag">BERT</span>
+          <span class="tag">spaCy</span><span class="tag">LDA</span>
+          <span class="tag">Streamlit</span><span class="tag">Python</span>
+          <span class="tag">Hugging Face</span>
+        </div>
+        <div class="project-footer">
+          <a href="#" class="project-link">↗ GitHub</a>
+          <a href="#" class="project-link">↗ App</a>
+          <span class="complexity-badge complexity-advanced">AVANÇADO</span>
+        </div>
+      </div>
+
+      <!-- Projeto 5: Analytics - Dashboard Power BI Avançado -->
+      <div class="project-card reveal reveal-delay-1">
+        <span class="project-icon">📊</span>
+        <div class="project-title">Analytics 360° — Power BI + Python</div>
+        <p class="project-desc">
+          Dashboard executivo 360° integrando Power BI com scripts Python para análise preditiva embutida:
+          forecasting com Prophet, análise de coorte, detecção de anomalias e KPIs dinâmicos.
+          Dados carregados via pipeline ETL automatizado com refresh diário.
+        </p>
+        <div class="project-tags">
+          <span class="tag">Power BI</span><span class="tag">Python</span>
+          <span class="tag">Prophet</span><span class="tag">DAX</span>
+          <span class="tag">SQL</span><span class="tag">ETL</span>
+        </div>
+        <div class="project-footer">
+          <a href="#" class="project-link">↗ GitHub</a>
+          <a href="#" class="project-link">↗ Dashboard</a>
+          <span class="complexity-badge complexity-advanced">AVANÇADO</span>
+        </div>
+      </div>
+
+      <!-- Projeto 6: Big Data Real-Time com R + Spark -->
+      <div class="project-card reveal reveal-delay-2">
+        <span class="project-icon">📡</span>
+        <div class="project-title">Análise Estatística Avançada com R</div>
+        <p class="project-desc">
+          Análise estatística completa em R: regressão multivariada, análise de sobrevivência (Kaplan-Meier),
+          testes de hipóteses avançados, ANOVA, séries temporais com ARIMA/SARIMA e visualizações publicação-ready
+          com ggplot2. Relatório dinâmico em R Markdown.
+        </p>
+        <div class="project-tags">
+          <span class="tag">R</span><span class="tag">ggplot2</span>
+          <span class="tag">tidyverse</span><span class="tag">ARIMA</span>
+          <span class="tag">caret</span><span class="tag">R Markdown</span>
+        </div>
+        <div class="project-footer">
+          <a href="#" class="project-link">↗ GitHub</a>
+          <a href="#" class="project-link">↗ Relatório</a>
+          <span class="complexity-badge complexity-advanced">AVANÇADO</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ====================================================
+       CONTATO
+  ==================================================== -->
+  <section id="contact">
+    <div class="contact-container">
+      <div class="section-header reveal">
+        <div class="section-tag" style="justify-content: center;">05 — Contato</div>
+        <h2 class="section-title reveal">VAMOS CONVERSAR?</h2>
+        <p class="section-desc reveal" style="margin: 1rem auto;">
+          Aberto a oportunidades, colaborações e projetos interessantes.
+          Manda uma mensagem — responderei em até 24h.
+        </p>
+      </div>
+
+      <a href="mailto:vitoor.projects@outlook.com" class="contact-email reveal">
+        vitoor.projects@outlook.com
+      </a>
+
+      <div class="social-links reveal">
+        <a href="https://github.com/vlbarbosa" target="_blank" class="social-link">GitHub</a>
+        <a href="https://linkedin.com/in/vlbarbosa" target="_blank" class="social-link">LinkedIn</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================================================
+       RODAPÉ
+  ==================================================== -->
+  <footer>
+    <span class="footer-copy">© 2025 · vL.d3vops · Vitor Ivo Rogério Barbosa Leite</span>
+    <span class="footer-copy" style="color: var(--accent-teal);">vitoor.projects@outlook.com</span>
+  </footer>
+
+
+  <!-- ============================================================
+       JAVASCRIPT — Todo documentado em português do Brasil
+  ============================================================ -->
+  <script>
+    /* ===========================================================
+       1. CURSOR PERSONALIZADO
+       ─────────────────────────────────────────────────────────
+       Cria um cursor de dois elementos:
+         • cursor-dot   → ponto sólido que segue o mouse imediatamente
+         • cursor-ring  → anel maior com movimento suavizado (lerp)
+       O efeito de suavização usa interpolação linear (lerp) no
+       loop de animação requestAnimationFrame.
+    =========================================================== */
+
+    const cursorDot  = document.getElementById('cursor-dot');
+    const cursorRing = document.getElementById('cursor-ring');
+
+    // Posições atuais (suavizadas) do anel
+    let ringX = 0, ringY = 0;
+
+    // Posição real do mouse (alvo do anel)
+    let targetX = 0, targetY = 0;
+
+    // Fator lerp: 0 = sem movimento, 1 = sem suavização
+    const LERP = 0.12;
+
+    /* Atualiza o alvo sempre que o mouse se move */
+    document.addEventListener('mousemove', (e) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
+      // O ponto segue sem delay
+      cursorDot.style.left = `${targetX}px`;
+      cursorDot.style.top  = `${targetY}px`;
+    });
+
+    /* Loop de animação do anel — usa lerp para suavizar */
+    function animateCursor() {
+      ringX += (targetX - ringX) * LERP;
+      ringY += (targetY - ringY) * LERP;
+      cursorRing.style.left = `${ringX}px`;
+      cursorRing.style.top  = `${ringY}px`;
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    /* Expande o cursor sobre elementos clicáveis */
+    document.querySelectorAll('a, button, .project-card, .chip, .social-link, .stat-item').forEach((el) => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+    });
+
+
+    /* ===========================================================
+       2. NAVBAR COMPACTA AO ROLAR
+       ─────────────────────────────────────────────────────────
+       Adiciona a classe "scrolled" à nav quando o usuário rola
+       mais de 50px — reduz o padding via CSS.
+    =========================================================== */
+
+    const navbar = document.getElementById('navbar');
+
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+
+    /* ===========================================================
+       3. BARRA DE PROGRESSO DE LEITURA
+       ─────────────────────────────────────────────────────────
+       Exibe quanto da página já foi percorrida.
+       Fórmula: (scroll atual / máximo scroll possível) × 100%
+    =========================================================== */
+
+    const readProgress = document.getElementById('read-progress');
+
+    window.addEventListener('scroll', () => {
+      const scrollTop  = window.scrollY;
+      const docHeight  = document.body.scrollHeight - window.innerHeight;
+      const percent    = (scrollTop / docHeight) * 100;
+      readProgress.style.width = `${percent}%`;
+    });
+
+
+    /* ===========================================================
+       4. EFEITO TYPEWRITER — TEXTO QUE DIGITA AUTOMATICAMENTE
+       ─────────────────────────────────────────────────────────
+       Alterna entre frases com animação de digitação e apagamento.
+       Estados: digitando → pausa → apagando → próxima frase
+    =========================================================== */
+
+    const typewriterEl = document.getElementById('typewriter-text');
+
+    // Frases que serão exibidas em sequência
+    const phrases = [
+      'Data Scientist Júnior',
+      'Especialista em Big Data Analytics',
+      'Explorador de Data Mining',
+      'Analista de Machine Learning',
+      'Python · SQL · Power BI · Spark',
+      'Transformando dados em decisões',
+    ];
+
+    let phraseIdx  = 0;     // índice da frase atual
+    let charIdx    = 0;     // posição do caractere atual na frase
+    let deleting   = false; // se está apagando ou digitando
+
+    function typeWriter() {
+      const current = phrases[phraseIdx];
+
+      if (deleting) {
+        charIdx--;
+        typewriterEl.textContent = current.slice(0, charIdx);
+      } else {
+        charIdx++;
+        typewriterEl.textContent = current.slice(0, charIdx);
+      }
+
+      // Define o delay de acordo com o estado
+      let delay = deleting ? 50 : 100;
+
+      if (!deleting && charIdx === current.length) {
+        // Frase completa — pausa antes de apagar
+        delay = 2000;
+        deleting = true;
+      } else if (deleting && charIdx === 0) {
+        // Apagamento concluído — passa para a próxima frase
+        deleting = false;
+        phraseIdx = (phraseIdx + 1) % phrases.length;
+        delay = 400;
+      }
+
+      setTimeout(typeWriter, delay);
+    }
+
+    // Começa após as animações do hero (1.2s)
+    setTimeout(typeWriter, 1200);
+
+
+    /* ===========================================================
+       5. REVEAL ON SCROLL — ANIMAÇÕES AO ROLAR A PÁGINA
+       ─────────────────────────────────────────────────────────
+       Usa IntersectionObserver para detectar quando um elemento
+       entra na viewport e aplica a classe "visible", que via CSS
+       translada o elemento para sua posição final (opacity 1).
+    =========================================================== */
+
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+
+          // Ativa a animação de entrada do elemento
+          entry.target.classList.add('visible');
+
+          // Dispara as barras de habilidade dentro do elemento
+          entry.target.querySelectorAll('.skill-fill').forEach((fill) => {
+            fill.style.width = `${fill.getAttribute('data-pct')}%`;
+          });
+
+          // Dispara os contadores de estatística
+          entry.target.querySelectorAll('.stat-number[data-target]').forEach(animateCounter);
+        });
+      },
+      {
+        threshold: 0.12,                     // 12% visível dispara
+        rootMargin: '0px 0px -40px 0px',    // margem para disparar um pouco antes
+      }
+    );
+
+    // Registra todos os elementos com classe .reveal
+    document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+
+
+    /* ===========================================================
+       6. CONTADOR ANIMADO
+       ─────────────────────────────────────────────────────────
+       Anima um número de 0 até o valor em data-target.
+       Usa easing ease-out cúbico para desacelerar no final.
+    =========================================================== */
+
+    function animateCounter(el) {
+      // Impede re-execução se já foi animado
+      if (el.dataset.animated) return;
+      el.dataset.animated = 'true';
+
+      const target   = parseInt(el.getAttribute('data-target'), 10);
+      const duration = 1800; // duração em milissegundos
+      const start    = performance.now();
+
+      function update(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        // Easing: ease-out cúbico — desacelera no final
+        const eased = 1 - Math.pow(1 - progress, 3);
+
+        el.textContent = Math.floor(eased * target);
+
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        } else {
+          el.textContent = target; // garante o valor exato no final
+        }
+      }
+
+      requestAnimationFrame(update);
+    }
+
+
+    /* ===========================================================
+       7. SISTEMA DE PARTÍCULAS — CANVAS
+       ─────────────────────────────────────────────────────────
+       Cria pontos flutuantes que se conectam quando ficam
+       próximos — efeito "constelação" no fundo da página.
+       Cada partícula tem posição, velocidade e raio aleatórios.
+    =========================================================== */
+
+    const canvas = document.getElementById('particles-canvas');
+    const ctx    = canvas.getContext('2d');
+
+    /* Ajusta o canvas ao tamanho da janela */
+    function resizeCanvas() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    /* Configurações */
+    const PARTICLE_COUNT  = 60;   // total de partículas
+    const CONNECT_DIST    = 130;  // distância máxima para conexão (px)
+    const SPEED           = 0.3;  // velocidade máxima de movimento
+
+    /* Cria as partículas com propriedades aleatórias */
+    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+      x:  Math.random() * canvas.width,
+      y:  Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * SPEED * 2, // velocidade horizontal
+      vy: (Math.random() - 0.5) * SPEED * 2, // velocidade vertical
+      r:  Math.random() * 1.5 + 0.5,          // raio entre 0.5 e 2px
+    }));
+
+    /* Loop principal de animação das partículas */
+    function drawParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // --- Atualiza e desenha cada partícula ---
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Rebate nas bordas (inverte velocidade)
+        if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(42, 122, 110, 0.6)';
+        ctx.fill();
+      });
+
+      // --- Desenha linhas entre partículas próximas ---
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx   = particles[i].x - particles[j].x;
+          const dy   = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < CONNECT_DIST) {
+            // Opacidade: máxima quando perto, zero quando na distância limite
+            const alpha = (1 - dist / CONNECT_DIST) * 0.3;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(42, 122, 110, ${alpha})`;
+            ctx.lineWidth   = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(drawParticles);
+    }
+
+    drawParticles();
+
+
+    /* ===========================================================
+       8. PARALLAX SUAVE NO HERO
+       ─────────────────────────────────────────────────────────
+       O conteúdo do hero se move ligeiramente para cima ao rolar,
+       criando profundidade. Só funciona enquanto o hero está visível.
+    =========================================================== */
+
+    const heroContent = document.querySelector('.hero-content');
+    const heroSection = document.getElementById('hero');
+
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      const heroH   = heroSection.offsetHeight;
+
+      if (scrollY < heroH && heroContent) {
+        const move    = scrollY * 0.15;
+        const opacity = 1 - scrollY / heroH;
+        heroContent.style.transform = `translateY(${move}px)`;
+        heroContent.style.opacity   = `${Math.max(opacity, 0)}`;
+      }
+    });
+
+
+    /* ===========================================================
+       9. MICRO-ANIMAÇÃO DE GLITCH NOS CARDS
+       ─────────────────────────────────────────────────────────
+       Ao passar o mouse sobre um card, aplica um leve deslocamento
+       horizontal aleatório por 80ms — simula "glitch" digital.
+    =========================================================== */
+
+    document.querySelectorAll('.project-card').forEach((card) => {
+      card.addEventListener('mouseenter', () => {
+        const glitch = (Math.random() * 2 - 1).toFixed(1); // -1 a 1px
+        card.style.transform = `translateY(-4px) translateX(${glitch}px)`;
+        setTimeout(() => {
+          card.style.transform = 'translateY(-4px)';
+        }, 80); // restaura após 80ms
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
+    });
+
+
+    /* ===========================================================
+       10. SMOOTH SCROLL — ROLAGEM SUAVE PARA LINKS ÂNCORA
+       ─────────────────────────────────────────────────────────
+       Intercepta cliques em links href="#seção" e calcula a
+       posição correta descontando a altura da navbar.
+    =========================================================== */
+
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) {
+          const offset = target.offsetTop - navbar.offsetHeight;
+          window.scrollTo({ top: offset, behavior: 'smooth' });
+        }
+      });
+    });
+
+
+    /* ===========================================================
+       11. EASTER EGG — KONAMI CODE
+       ─────────────────────────────────────────────────────────
+       Se o visitante digitar: ↑ ↑ ↓ ↓ ← → ← → B A
+       exibe uma mensagem surpresa. Curiosidade é uma
+       característica fundamental de todo cientista de dados!
+    =========================================================== */
+
+    const KONAMI_CODE = [
+      'ArrowUp','ArrowUp','ArrowDown','ArrowDown',
+      'ArrowLeft','ArrowRight','ArrowLeft','ArrowRight',
+      'b','a'
+    ];
+    let konamiIdx = 0;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === KONAMI_CODE[konamiIdx]) {
+        konamiIdx++;
+        if (konamiIdx === KONAMI_CODE.length) {
+          alert('🎮 Easter egg encontrado!\nCuriosidade é a característica #1 de um bom cientista de dados. Você tem potencial!');
+          konamiIdx = 0;
+        }
+      } else {
+        konamiIdx = 0; // reinicia se errar a sequência
+      }
+    });
+
+  </script>
+
+</body>
+</html>
