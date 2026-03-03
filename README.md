@@ -4,7 +4,7 @@
 
 Site de portfólio profissional construído em **HTML puro, CSS e JavaScript** — sem frameworks, sem dependências, zero build step.
 
-🔗 **Live:** [vlbarbosa.vercel.app]([https://vlbarbosa.vercel.app](https://vl-d3vops.vercel.app))
+🔗 **Live:** [vlbarbosa.vercel.app](https://vl-d3vops.vercel.app)
 📧 **Contato:** vitoor.projects@outlook.com  
 🐙 **GitHub:** [github.com/vlbarbosa](https://github.com/vlbarbosa)  
 💼 **LinkedIn:** [linkedin.com/in/vlbarbosa](https://linkedin.com/in/vlbarbosa)
