@@ -1505,8 +1505,8 @@
         <div class="project-title">vL.d3vops — Portfólio Engine</div>
         <p class="project-desc">
           Este próprio portfólio: Single File Application em HTML, CSS e JavaScript puros, sem frameworks.
-          Sistema de partículas via Canvas, cursor personalizado com Lerp, IntersectionObserver para animações
-          e Easter Egg com Konami Code.
+          Sistema de partículas via Canvas API, cursor personalizado com interpolação Lerp, animações via
+          IntersectionObserver e Easter Egg com Konami Code.
         </p>
         <div class="project-tags">
           <span class="tag">HTML5</span><span class="tag">CSS3</span>
@@ -1922,4 +1922,39 @@
     let konamiIdx = 0;
 
     document.addEventListener('keydown', (e) => {
-      if (e.key
+      if (e.key === KONAMI_CODE[konamiIdx]) {
+        konamiIdx++;
+        if (konamiIdx === KONAMI_CODE.length) {
+          konamiIdx = 0;
+          // Easter egg: mensagem surpresa
+          const msg = document.createElement('div');
+          msg.style.cssText = `
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(10,12,15,0.97); border: 1px solid rgba(91,191,170,0.6);
+            padding: 3rem 4rem; border-radius: 8px; z-index: 9999; text-align: center;
+            font-family: 'DM Mono', monospace; color: #5bbfaa; font-size: 0.9rem;
+            letter-spacing: 0.1em; box-shadow: 0 0 80px rgba(42,122,110,0.3);
+          `;
+          msg.innerHTML = `
+            <div style="font-size:2rem;margin-bottom:1rem;">🎮</div>
+            <div style="font-size:1.1rem;margin-bottom:0.5rem;">KONAMI CODE ATIVADO</div>
+            <div style="color:#7a9aaa;font-size:0.75rem;margin-bottom:1.5rem;">
+              Curiosidade é a habilidade mais valiosa em Data Science.
+            </div>
+            <button onclick="this.parentElement.remove()" style="
+              background: transparent; border: 1px solid rgba(91,191,170,0.4);
+              color: #5bbfaa; padding: 0.5rem 1.5rem; border-radius: 4px;
+              font-family: 'DM Mono', monospace; font-size: 0.75rem;
+              letter-spacing: 0.1em; cursor: pointer;
+            ">FECHAR</button>
+          `;
+          document.body.appendChild(msg);
+        }
+      } else {
+        konamiIdx = 0;
+      }
+    });
+
+  </script>
+</body>
+</html>
