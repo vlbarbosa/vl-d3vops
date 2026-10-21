@@ -7,6 +7,18 @@
   <meta name="description" content="Vitor Barbosa — QA Analyst. Testes funcionais e automação de testes Web, Mobile e API com Java, Selenium, Appium e RestAssured." />
   <meta name="theme-color" content="#18191b" />
 
+  <!-- Ícones (aba do navegador e tela inicial do celular) -->
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+
+  <!-- Prévia ao compartilhar o link (LinkedIn, WhatsApp) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://vl-d3vops.vercel.app" />
+  <meta property="og:title" content="Vitor Barbosa · QA Analyst" />
+  <meta property="og:description" content="Testes funcionais e automação de testes Web, Mobile e API com Java, Selenium, Appium e RestAssured." />
+  <meta property="og:image" content="https://vl-d3vops.vercel.app/assets/og-image.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -94,13 +106,10 @@
       font-size: 15px;
     }
     .logo-mark {
-      width: 30px; height: 30px;
-      display: grid; place-items: center;
+      width: 32px; height: 32px;
+      border-radius: 50%;
       border: 1px solid var(--border);
-      border-radius: 8px;
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--accent);
+      object-fit: cover;
       background: var(--surface);
     }
 
@@ -158,6 +167,23 @@
        HERO
        ========================================================== */
     .hero { padding: clamp(64px, 12vw, 128px) 0 clamp(56px, 9vw, 96px); }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: clamp(32px, 6vw, 72px);
+    }
+    .hero-avatar {
+      width: clamp(200px, 26vw, 300px);
+      height: auto;
+      aspect-ratio: 1;
+      justify-self: start;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 0 8px var(--surface), 0 0 0 9px var(--border);
+    }
 
     .status {
       display: inline-flex;
@@ -243,7 +269,30 @@
     }
     .about p + p { margin-top: 16px; }
 
-    .focus-list { list-style: none; display: grid; gap: 14px; }
+    .focus-list { list-style: none; display: grid; gap: 14px; margin-top: 32px; }
+
+    .figure {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      align-self: start;
+    }
+    .figure img { display: block; width: 100%; height: auto; }
+    .figure figcaption { padding: 16px 18px 18px; }
+    .figure .brand {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text);
+    }
+    .figure .motto {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 2px 0 12px;
+    }
     .focus-list li {
       display: flex;
       gap: 12px;
@@ -432,6 +481,8 @@
 
     /* Tablet em pé e abaixo */
     @media (max-width: 860px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-avatar { order: -1; width: clamp(112px, 28vw, 168px); box-shadow: 0 0 0 5px var(--surface), 0 0 0 6px var(--border); }
       .about { grid-template-columns: 1fr; }
       .tl-item { grid-template-columns: 1fr; gap: 4px; }
     }
@@ -480,7 +531,7 @@
   <nav class="nav" id="nav">
     <div class="container nav-inner">
       <a href="#inicio" class="logo">
-        <span class="logo-mark">VB</span>
+        <img class="logo-mark" src="assets/logo.jpg" alt="" width="32" height="32" />
         <span class="logo-name">Vitor Barbosa</span>
       </a>
       <button class="menu-btn" id="menu-btn" aria-label="Abrir menu" aria-expanded="false">☰</button>
@@ -499,15 +550,18 @@
     <!-- ================= INÍCIO ================= -->
     <section class="hero" id="inicio">
       <div class="container">
+        <div class="hero-grid">
+        <div>
         <div class="status"><span class="status-dot"></span>Disponível para oportunidades</div>
 
         <h1>Vitor Barbosa</h1>
         <div class="role">QA Analyst · Automação de Testes</div>
 
         <p class="lead">
-          <strong>10 anos como Quality Gate</strong> validando requisitos e regras de negócio.
-          Hoje aplico esse olhar em testes funcionais e automação de testes
-          <strong>Web, Mobile e API</strong> com Java, Selenium, Appium e RestAssured.
+          <strong>Mais de 10 anos atuando com qualidade</strong> como Quality Gate e Analista de QA:
+          validação de requisitos, regras de negócio, casos de teste e documentação de bugs.
+          Hoje atuo com testes funcionais e automação de testes <strong>Web, Mobile e API</strong>
+          com Java, Selenium, Appium e RestAssured.
         </p>
 
         <div class="actions">
@@ -515,11 +569,15 @@
           <a href="https://github.com/vlbarbosa" target="_blank" rel="noopener" class="btn btn-ghost">GitHub ↗</a>
           <a href="#contato" class="btn btn-ghost">Contato</a>
         </div>
+        </div>
+
+        <img class="hero-avatar" src="assets/avatar.jpg" alt="Ilustração de Vitor Barbosa" width="300" height="300" fetchpriority="high" />
+        </div>
 
         <div class="facts">
           <div class="fact">
-            <div class="fact-num">10 anos</div>
-            <div class="fact-label">em Quality Gate e auditoria</div>
+            <div class="fact-num">+10 anos</div>
+            <div class="fact-label">em qualidade, Quality Gate e QA</div>
           </div>
           <div class="fact">
             <div class="fact-num">3 camadas</div>
@@ -542,12 +600,14 @@
         <div class="about">
           <div class="reveal">
             <p>
-              Foram <strong>10 anos atuando como Quality Gate</strong> no Ministério do Esporte e no CBCP:
-              validando requisitos, conferindo regras de negócio e auditando processos antes de qualquer entrega seguir adiante.
+              São <strong>mais de 10 anos como ponto de qualidade</strong>: no Ministério do Esporte, como Analista de
+              Qualidade e Conformidade (Quality Gate), e no CBCP, como Quality Gate / Analista de QA. Validei requisitos
+              e regras de negócio, criei checklists e matrizes de rastreabilidade, identifiquei cenários de exceção
+              e documentei não conformidades com evidências.
             </p>
             <p>
-              Levei esse olhar de auditor para a <strong>Qualidade de Software</strong>. Atuo com testes funcionais,
-              regressivos, exploratórios e E2E, casos de teste, matriz de rastreabilidade e bug reports com evidências.
+              Atuo com <strong>Qualidade de Software</strong>: testes funcionais, regressivos, exploratórios e E2E,
+              casos de teste, testes de API com Postman e bug reports com evidências.
               Na automação, trabalho com <strong>Java, Selenium, Appium e RestAssured</strong>, aplicando Page Object Model,
               esperas explícitas e integração contínua.
             </p>
@@ -555,9 +615,7 @@
               Uso IA como apoio para gerar cenários e massa de dados, sempre revisando o resultado.
               Gosto de entender o negócio por trás de cada funcionalidade, porque é ali que estão os bugs que importam.
             </p>
-          </div>
-
-          <ul class="focus-list reveal">
+                      <ul class="focus-list">
             <li>Testes funcionais e automação Web, Mobile e API</li>
             <li>Validação de requisitos e regras de negócio</li>
             <li>Casos de teste, rastreabilidade e bug reports</li>
@@ -565,6 +623,22 @@
             <li>Testes de contrato e cenários negativos em APIs</li>
             <li>Trabalho junto a dev e PO em times ágeis</li>
           </ul>
+          </div>
+
+<figure class="figure reveal">
+            <img src="assets/ilustracao.jpg" alt="Ilustração de Vitor Barbosa com seus símbolos: fé, disciplina, foco e carreira" width="900" height="900" loading="lazy" />
+            <figcaption>
+              <div class="brand">vL.d3vops</div>
+              <div class="motto">Level up everyday</div>
+              <div class="tags">
+                <span class="tag small">Foco</span>
+                <span class="tag small">Disciplina</span>
+                <span class="tag small">Fé</span>
+                <span class="tag small">Constância</span>
+                <span class="tag small">Resultados</span>
+              </div>
+            </figcaption>
+          </figure>
         </div>
       </div>
     </section>
@@ -573,46 +647,80 @@
     <section id="trajetoria">
       <div class="container">
         <div class="eyebrow reveal">Trajetória</div>
-        <h2 class="reveal">Experiência e formação</h2>
+        <h2 class="reveal">Experiência</h2>
 
         <div class="timeline">
           <div class="tl-item reveal">
-            <div class="tl-when">Atual</div>
+            <div class="tl-when">2026 — Atual</div>
             <div>
-              <h3>Transição para QA · Testes e Automação</h3>
-              <div class="tl-where">Projetos próprios de automação em Java</div>
+              <h3>Analista de QA · Automação de Testes</h3>
+              <div class="tl-where">Projetos pessoais · GitHub</div>
               <p class="tl-desc">
-                Testes funcionais e automação de testes Web, Mobile e API com Selenium, Appium,
-                RestAssured e JUnit 5, com pipeline no GitHub Actions.
+                Automação de testes Web, Mobile e API com Java, Selenium, Appium, RestAssured e JUnit 5:
+                Page Object Model, testes de contrato, cenários negativos e pipeline no GitHub Actions.
               </p>
             </div>
           </div>
 
           <div class="tl-item reveal">
-            <div class="tl-when">10 anos</div>
+            <div class="tl-when">07/2025 — 08/2026</div>
             <div>
-              <h3>Quality Gate · Validação e Auditoria de Processos</h3>
-              <div class="tl-where">Ministério do Esporte · CBCP</div>
+              <h3>Analista de Projetos · Quality Gate / Analista de QA</h3>
+              <div class="tl-where">CBCP · Comitê Brasileiro de Clubes Paralímpicos · Brasília, DF</div>
               <p class="tl-desc">
-                Validação de requisitos e regras de negócio, conferência de conformidade
-                e auditoria de processos antes da aprovação das entregas.
+                Validação de critérios de elegibilidade e regras de negócio com matriz de rastreabilidade
+                e critérios de aceite. Identificação de cenários de exceção (edge cases), documentação de
+                não conformidades e pareceres técnicos, contribuindo para a redução de retrabalho.
               </p>
             </div>
           </div>
 
           <div class="tl-item reveal">
-            <div class="tl-when">2022 — 2026</div>
+            <div class="tl-when">08/2015 — 07/2025</div>
             <div>
-              <h3>Análise e Desenvolvimento de Sistemas <span class="badge">Em andamento</span></h3>
-              <div class="tl-where">ESTÁCIO · Tecnólogo</div>
+              <h3>Analista de Projetos · Analista de Qualidade e Conformidade</h3>
+              <div class="tl-where">Ministério do Esporte · Brasília, DF</div>
+              <p class="tl-desc">
+                Ponto de qualidade (Quality Gate) em todo o ciclo de vida de projetos. Validação de requisitos
+                e regras de negócio, checklists de verificação e roteiros de auditoria, registro de não conformidades
+                em pareceres técnicos com evidências e rastreabilidade, e análise de indicadores para mitigação de riscos.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <h2 class="reveal" style="margin-top: clamp(48px, 8vw, 72px);">Formação</h2>
+
+        <div class="timeline">
+          <div class="tl-item reveal">
+            <div class="tl-when">2022 — 2027</div>
+            <div>
+              <h3>Análise e Desenvolvimento de Sistemas <span class="badge">Cursando</span></h3>
+              <div class="tl-where">Estácio · Tecnólogo</div>
             </div>
           </div>
 
           <div class="tl-item reveal">
-            <div class="tl-when">2026</div>
+            <div class="tl-when">2026 — 2027</div>
             <div>
-              <h3>Pós-graduações em Dados <span class="badge">Em andamento</span></h3>
-              <div class="tl-where">FAMEF · Ciência de Dados & Big Data Analytics · Engenharia de Dados · Data Mining</div>
+              <h3>Pós-graduação em Engenharia de Software <span class="badge">Cursando</span></h3>
+              <div class="tl-where">FAMEF · Lato Sensu</div>
+            </div>
+          </div>
+
+          <div class="tl-item reveal">
+            <div class="tl-when">2026 — 2027</div>
+            <div>
+              <h3>Pós-graduações em Ciência de Dados & Big Data Analytics e Data Mining <span class="badge">Cursando</span></h3>
+              <div class="tl-where">FAMEF · Lato Sensu</div>
+            </div>
+          </div>
+
+          <div class="tl-item reveal">
+            <div class="tl-when">2013 — 2016</div>
+            <div>
+              <h3>Bacharelado em Gestão Pública</h3>
+              <div class="tl-where">UNOPAR</div>
             </div>
           </div>
         </div>
